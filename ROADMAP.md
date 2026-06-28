@@ -1,7 +1,7 @@
 # ROADMAP — Candidate Voice Agent
 
-> **Checkpoint:** Phase 2 complete · 2026-06-28
-> **Test suite:** 77/77 passing
+> **Checkpoint:** Phase 3 hardening (Pydantic V2, lifespan, dead code) · 2026-06-28
+> **Test suite:** 77/77 passing, 0 deprecation warnings
 
 ---
 
@@ -35,11 +35,13 @@
 
 ---
 
-## Phase 3: Production Hardening ⏳ DEFERRED
+## Phase 3: Production Hardening ✅ PARTIALLY COMPLETE
 
+- [x] Input validation hardening (Pydantic V2 migration, file upload sanitization)
+- [x] Migrate `on_event` startup to lifespan pattern
+- [x] Remove dead code (`parse_resume_text_with_llm` stub)
 - [ ] Database migration tool (Alembic or manual migration scripts)
 - [ ] Streaming TTS optimization (WebSocket streaming for lower latency)
-- [ ] Input validation hardening (Pydantic v2 migration, file upload sanitization)
 - [ ] Rate limiting & DoS protection
 - [ ] HTTPS/TLS enforcement
 - [ ] Logging aggregation & monitoring
@@ -72,10 +74,6 @@
 
 | Issue | Location | Severity |
 |-------|----------|----------|
-| Stub LLM call in PDF parser | `core/pdf_parser.py:39` | MEDIUM |
 | Raw SQL instead of ORM | `db.py` | LOW |
-| Pydantic V1 validators deprecated | `main.py:62,77` | LOW |
-| `on_event` startup deprecated | `main.py:149` | LOW |
-| `apscheduler` unused | `requirements.txt` | LOW |
 | No `.env` loading in production | `config.yaml` | MEDIUM |
 | Regex-based JD parser fragile | `core/scraper.py` | MEDIUM |
