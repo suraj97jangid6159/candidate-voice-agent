@@ -1,0 +1,50 @@
+app:
+  port: 8000
+  host: "127.0.0.1"
+  db_path: "database.db"
+  mock_mode: true
+  max_call_duration_minutes: 30
+  log_level: "INFO"
+
+adapters:
+  llm:
+    primary: "openrouter"
+    model: "meta-llama/llama-3-70b-instruct"
+    fallback: "mock"
+    timeout_seconds: 30
+    max_retries: 2
+  stt:
+    primary: "deepgram"
+    fallback: "mock"
+    timeout_seconds: 30
+    max_retries: 2
+  tts:
+    primary: "elevenlabs"
+    fallback: "edge-tts"
+    timeout_seconds: 30
+    max_retries: 2
+  telephony:
+    primary: "vapi"
+    fallback: "mock"
+    timeout_seconds: 30
+    max_retries: 2
+
+security:
+  strict_whitelist: true
+  block_agreements: true
+  log_all_events: true
+  scan_inputs: true
+  injection_keywords: [
+    "ignore previous", "ignore all previous", "system prompt",
+    "developer mode", "new instructions", "disregard instructions",
+    "bypass instructions", "you are now a", "system override",
+    "ignore rules", "forget everything", "new role", "DAN mode",
+    "jailbreak", "ignore your", "pretend to be"
+  ]
+  agreement_patterns: [
+    "i agree to", "i accept on behalf", "i promise",
+    "we agree on behalf", "on behalf of .*, i (?:agree|accept|promise)",
+    "i can guarantee that .* will accept", "we have a deal",
+    "i confirm the agreement", "i accept those terms",
+    "deal", "agreed", "confirmed", "i commit to"
+  ]

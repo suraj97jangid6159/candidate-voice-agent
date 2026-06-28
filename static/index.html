@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Voice HR Agent - Agentic Candidate Representative</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <div class="background-decor">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
+    </div>
+
+    <header class="app-header">
+        <div class="header-logo">
+            <i class="fa-solid fa-microphone-lines logo-icon"></i>
+            <h1>VoiceAgent <span>Pro</span></h1>
+        </div>
+        <div class="header-status">
+            <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> System Active</span>
+            <span class="badge badge-primary" id="mockModeIndicator"><i class="fa-solid fa-vial"></i> Mock Mode: ON</span>
+        </div>
+    </header>
+
+    <main class="dashboard-grid">
+        <!-- LEFT: Inputs & Configurations -->
+        <section class="dashboard-sidebar">
+            <!-- Card 1: Candidate Profile -->
+            <div class="glass-card" id="profileCard">
+                <div class="card-header">
+                    <i class="fa-solid fa-user-tie header-icon"></i>
+                    <h2>Candidate Profile</h2>
+                </div>
+                <form id="candidateForm" class="card-body">
+                    <div class="form-group">
+                        <label for="candName">Full Name</label>
+                        <input type="text" id="candName" name="name" placeholder="Alex Mercer" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="candPhone">Phone Number</label>
+                        <input type="tel" id="candPhone" name="phone" placeholder="+15550199" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="candCurrentCtc">Current CTC</label>
+                            <input type="text" id="candCurrentCtc" name="current_ctc" placeholder="$90k">
+                        </div>
+                        <div class="form-group">
+                            <label for="candExpectedCtc">Expected CTC</label>
+                            <input type="text" id="candExpectedCtc" name="expected_ctc" placeholder="$110k">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="candNotice">Notice Period</label>
+                        <input type="text" id="candNotice" name="notice_period" placeholder="30 days / Immediate">
+                    </div>
+                    <div class="form-group">
+                        <label for="candSkills">Skills (comma-separated)</label>
+                        <input type="text" id="candSkills" name="skills" placeholder="Python, FastAPI, AWS, Docker">
+                    </div>
+                    <div class="form-group">
+                        <label for="resumeUpload">Resume PDF</label>
+                        <div class="file-dropzone" id="dropzone">
+                            <i class="fa-solid fa-cloud-arrow-up drop-icon"></i>
+                            <p>Drag resume PDF here or click to upload</p>
+                            <span id="fileName" class="file-name-label"></span>
+                            <input type="file" id="resumeUpload" name="resume" accept=".pdf" required style="display:none;">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-submit" id="saveProfileBtn">
+                        <i class="fa-solid fa-save"></i> Save & Parse Profile
+                    </button>
+                </form>
+            </div>
+
+            <!-- Card 2: Job Details & HR Call Target -->
+            <div class="glass-card disabled-card" id="jobCard">
+                <div class="card-header">
+                    <i class="fa-solid fa-briefcase header-icon"></i>
+                    <h2>Job Details & HR Target</h2>
+                </div>
+                <form id="jobForm" class="card-body">
+                    <div class="form-group">
+                        <label for="jdUrl">Job Description URL</label>
+                        <div class="input-with-button">
+                            <input type="url" id="jdUrl" placeholder="https://careers.google.com/jobs/...">
+                            <button type="button" class="btn btn-secondary" id="scrapeBtn">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Scrape
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="companyName">Company Name</label>
+                        <input type="text" id="companyName" placeholder="Tech Giants Corp" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="jobTitle">Job Title</label>
+                        <input type="text" id="jobTitle" placeholder="Senior Software Engineer" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="jdText">Job Description Text</label>
+                        <textarea id="jdText" placeholder="Paste full job description requirements here..." rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="hrPhone">HR Phone Number (Target)</label>
+                        <input type="tel" id="hrPhone" placeholder="+15550188" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="startCallBtn">
+                        <i class="fa-solid fa-phone-volume"></i> Initiate Outbound Call
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- RIGHT: Live Call Console & Logs -->
+        <section class="dashboard-content">
+            <!-- Card 3: Active Call Stream Terminal -->
+            <div class="glass-card" id="terminalCard">
+                <div class="card-header">
+                    <div class="header-title">
+                        <i class="fa-solid fa-headset header-icon icon-pulse"></i>
+                        <h2>Live Dialog Console</h2>
+                    </div>
+                    <div class="call-indicator" id="callStatusBadge">Idle</div>
+                </div>
+                <div class="card-body terminal-body">
+                    <div class="terminal-screen" id="terminalScreen">
+                        <div class="terminal-welcome">
+                            <i class="fa-solid fa-terminal welcome-icon"></i>
+                            <p>Await dialing instructions. Set candidate profile first, then trigger call to HR.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Simulated HR message sender (for mock offline mode) -->
+                    <div class="simulator-input-area" id="simulatorArea" style="display: none;">
+                        <input type="text" id="simulatorInput" placeholder="Type simulated HR response...">
+                        <button type="button" class="btn btn-primary" id="simulatorSendBtn">
+                            <i class="fa-solid fa-paper-plane"></i> Send
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Historical Logs -->
+            <div class="glass-card" id="historyCard">
+                <div class="card-header">
+                    <i class="fa-solid fa-clock-rotate-left header-icon"></i>
+                    <h2>Call History & Outbound Log</h2>
+                </div>
+                <div class="card-body history-body">
+                    <div class="table-responsive">
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>Candidate</th>
+                                    <th>Company</th>
+                                    <th>Job Role</th>
+                                    <th>HR Number</th>
+                                    <th>Status</th>
+                                    <th>Callback Scheduled</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody">
+                                <tr>
+                                    <td colspan="7" class="empty-state">No call logs recorded yet.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Dialog Details Modal -->
+    <div class="modal" id="transcriptModal">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h2>Call Detailed Transcript</h2>
+                <button class="modal-close" id="modalCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <pre class="transcript-box" id="transcriptBox"></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Source -->
+    <script src="static/app.js"></script>
+</body>
+</html>
