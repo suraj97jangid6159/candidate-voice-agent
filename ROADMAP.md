@@ -1,7 +1,7 @@
 # ROADMAP — Candidate Voice Agent
 
-> **Checkpoint:** Phase 1 complete · 2026-06-28
-> **Test suite:** 69/69 passing
+> **Checkpoint:** Phase 2 complete · 2026-06-28
+> **Test suite:** 77/77 passing
 
 ---
 
@@ -20,19 +20,18 @@
 
 ---
 
-## Phase 2: Notification & Scheduler Service ⏳ NEXT
+## Phase 2: Notification & Scheduler Service ✅ COMPLETE
 
-**Dependencies:** `apscheduler` (in requirements.txt, unused), `scheduled_callbacks` table (exists), SendGrid (in `.env.example`, unused)
+**Files:** `core/scheduler.py`, `core/notifications.py`
 
-**What needs to be built:**
-- [ ] Background scheduler in `main.py` using `apscheduler` to process `scheduled_callbacks`
-- [ ] Email notification service (SendGrid) for callback reminders
-- [ ] SMS notification fallback (Twilio SMS)
-- [ ] Dashboard notification indicators (bell/badge for upcoming callbacks)
-- [ ] Tests for scheduler and notification service
-
-**Files to create:** `core/scheduler.py`, `core/notifications.py`
-**Files to modify:** `main.py`, `static/index.html`, `static/app.js`
+| Task | Status |
+|------|--------|
+| Background scheduler (`APScheduler`) polling pending callbacks every 60s | ✅ |
+| Email notification service (SendGrid) with mock fallback | ✅ |
+| `main.py` startup wiring + API endpoints (`/api/scheduler/status`, `/api/scheduler/callbacks`) | ✅ |
+| Tests for scheduler and notification service (`tests/test_scheduler.py`) | ✅ 8 tests |
+| Dashboard notification indicators | ⏳ deferred |
+| SMS notification fallback (Twilio SMS) | ⏳ deferred |
 
 ---
 
