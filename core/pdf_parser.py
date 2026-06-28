@@ -16,31 +16,6 @@ def extract_text_from_pdf(pdf_path):
         print(f"Error reading PDF {pdf_path}: {e}")
         return ""
 
-def parse_resume_text_with_llm(resume_text, llm_adapter):
-    """Uses the provided LLM adapter to parse the resume text into structured JSON."""
-    system_prompt = (
-        "You are an expert resume parsing assistant. Extract candidate information from the resume text.\n"
-        "Return ONLY a valid JSON object matching this schema:\n"
-        "{\n"
-        "  \"name\": \"Full Name\",\n"
-        "  \"phone\": \"Phone number (with country code if possible)\",\n"
-        "  \"current_ctc\": \"Current CTC/Salary (or 'Not Specified')\",\n"
-        "  \"expected_ctc\": \"Expected CTC/Salary (or 'Not Specified')\",\n"
-        "  \"notice_period\": \"Notice Period (e.g. 30 days, Immediate, or 'Not Specified')\",\n"
-        "  \"skills\": [\"Skill1\", \"Skill2\", ...]\n"
-        "}\n"
-        "Do not include any introductory or concluding text, markdown code blocks, or explanations. Only return valid JSON."
-    )
-    
-    try:
-        # We run the LLM adapter synchronously or asynchronously depending on implementation.
-        # We will design the LLM adapter to be async, so we'll make this helper async or run in loop.
-        # Let's write this to support async.
-        return system_prompt
-    except Exception as e:
-        print(f"Error parsing resume with LLM: {e}")
-        return None
-
 # Simple regex fallback in case LLM is offline/mock
 def parse_resume_fallback(resume_text):
     """Simple regex/heuristics to parse contact information if LLM fails or is in mock mode."""
