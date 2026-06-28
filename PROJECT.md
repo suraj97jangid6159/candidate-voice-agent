@@ -1,4 +1,7 @@
-# AI Voice HR Representative Agent
+# Candidate Voice Agent
+
+**Repo:** `candidate-voice-agent`  
+**Branch workflow:** `main` (stable, tested) ← `feature/*` (new features) ← `fix/*` (bug fixes)
 
 An AI-powered voice agent that calls HR managers on behalf of a job candidate, pitches their profile, answers screening questions, and warm-transfers interested HR to the candidate.
 

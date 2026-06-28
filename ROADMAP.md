@@ -1,4 +1,4 @@
-# ROADMAP — AI Voice HR Representative Agent
+# ROADMAP — Candidate Voice Agent
 
 > **Checkpoint:** Phase 1 complete · 2026-06-28
 > **Test suite:** 69/69 passing
