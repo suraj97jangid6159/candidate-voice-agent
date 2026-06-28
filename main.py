@@ -29,6 +29,8 @@ from core.security import (
     scan_input_injection, scan_output_agreement, scan_sensitive_data,
     sanitize_text, validate_transfer_request, is_valid_phone_format
 )
+from core.scheduler import CallbackScheduler
+from core.notifications import NotificationService
 from adapters import (
     load_config,
     get_llm_adapter,
@@ -37,7 +39,7 @@ from adapters import (
     get_telephony_adapter
 )
 
-app = FastAPI(title="AI Voice HR Representative Agent", version="2.0.0")
+app = FastAPI(title="Candidate Voice Agent", version="2.1.0")
 
 # Mount static folder
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -49,6 +51,9 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 # Keep track of active WebSocket connections for call updates
 active_connections: Dict[str, List[WebSocket]] = {}
+
+# Scheduler instance (initialized on startup)
+callback_scheduler: Optional[CallbackScheduler] = None
 
 # Pydantic Models for Validation
 class CandidateCreate(BaseModel):
@@ -149,7 +154,11 @@ async def process_message_with_security(call_id: str, message: str, history: lis
 @app.on_event("startup")
 async def startup():
     db.init_db()
-    logger.info("AI Voice HR Agent started successfully")
+    notifier = NotificationService()
+    global callback_scheduler
+    callback_scheduler = CallbackScheduler(notifier)
+    callback_scheduler.start()
+    logger.info("Candidate Voice Agent started successfully with scheduler")
 
 # Serve static dashboard
 @app.get("/")
@@ -393,6 +402,21 @@ async def get_calls():
 @app.get("/api/security/logs")
 async def get_security_logs(limit: int = 100):
     return db.get_all_security_logs(limit)
+
+# API: Scheduler status
+@app.get("/api/scheduler/status")
+async def scheduler_status():
+    if not callback_scheduler:
+        return {"status": "not_initialized"}
+    return {
+        "status": "running" if callback_scheduler.is_running else "stopped",
+        "jobs": callback_scheduler.get_jobs(),
+    }
+
+# API: Get pending callbacks
+@app.get("/api/scheduler/callbacks")
+async def get_pending_callbacks():
+    return db.get_pending_callbacks()
 
 # API: Get transcript for specific call
 @app.get("/api/calls/{call_id}/transcript")
