@@ -1,7 +1,8 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File, Form, HTTPException, Request, BackgroundTasks
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, EmailStr, validator
+from pydantic import BaseModel, EmailStr, field_validator
 from typing import Optional, List, Dict
 import uvicorn
 import yaml
@@ -39,21 +40,35 @@ from adapters import (
     get_telephony_adapter
 )
 
-app = FastAPI(title="Candidate Voice Agent", version="2.1.0")
-
-# Mount static folder
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
 os.makedirs(STATIC_DIR, exist_ok=True)
 os.makedirs(UPLOADS_DIR, exist_ok=True)
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 # Keep track of active WebSocket connections for call updates
 active_connections: Dict[str, List[WebSocket]] = {}
 
 # Scheduler instance (initialized on startup)
 callback_scheduler: Optional[CallbackScheduler] = None
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    db.init_db()
+    notifier = NotificationService()
+    global callback_scheduler
+    callback_scheduler = CallbackScheduler(notifier)
+    callback_scheduler.start()
+    logger.info("Candidate Voice Agent started successfully with scheduler")
+    yield
+    if callback_scheduler:
+        callback_scheduler.stop()
+    logger.info("Candidate Voice Agent stopped")
+
+
+app = FastAPI(title="Candidate Voice Agent", version="2.1.0", lifespan=lifespan)
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 # Pydantic Models for Validation
 class CandidateCreate(BaseModel):
@@ -64,7 +79,8 @@ class CandidateCreate(BaseModel):
     notice_period: Optional[str] = None
     skills: Optional[str] = None
     
-    @validator('phone')
+    @field_validator('phone')
+    @classmethod
     def validate_phone(cls, v):
         if not is_valid_phone_format(v):
             raise ValueError('Invalid phone number format')
@@ -79,7 +95,8 @@ class JobCreate(BaseModel):
     hr_phone: Optional[str] = None
     hr_email: Optional[str] = None
     
-    @validator('hr_phone')
+    @field_validator('hr_phone')
+    @classmethod
     def validate_hr_phone(cls, v):
         if v and not is_valid_phone_format(v):
             raise ValueError('Invalid HR phone number format')
@@ -149,16 +166,6 @@ async def process_message_with_security(call_id: str, message: str, history: lis
         return next_state, safe_response, action, True
     
     return next_state, response, action, False
-
-# Startup Event
-@app.on_event("startup")
-async def startup():
-    db.init_db()
-    notifier = NotificationService()
-    global callback_scheduler
-    callback_scheduler = CallbackScheduler(notifier)
-    callback_scheduler.start()
-    logger.info("Candidate Voice Agent started successfully with scheduler")
 
 # Serve static dashboard
 @app.get("/")
