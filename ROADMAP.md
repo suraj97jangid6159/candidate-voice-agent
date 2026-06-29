@@ -48,14 +48,18 @@
 
 ---
 
-## Phase 4: Enhanced Features ⏳ DEFERRED
+## Phase 4: Enhanced Features ⏳ IN PROGRESS (plan created)
 
-- [ ] Multi-candidate support (dashboard switching)
-- [ ] Resume parsing with actual LLM calls (stub in `core/pdf_parser.py`)
-- [ ] LinkedIn/Naukri scraper with Playwright fallback
-- [ ] Call recording download & playback in dashboard
-- [ ] Analytics dashboard (call duration trends, success rates)
-- [ ] Webhook retry with exponential backoff (carrier failover)
+**Files:** `.planning/phases/04-enhanced-features/04-01-PLAN.md`
+
+| Task | Status |
+|------|--------|
+| Multi-candidate dashboard | ⏳ Planned |
+| Verify & test LLM resume parsing | ⏳ Planned |
+| Playwright JD scraper | ⏳ Planned |
+| Call recording playback | ⏳ Planned |
+| Analytics dashboard (Chart.js) | ⏳ Planned |
+| Webhook retry with backoff | ⏳ Planned |
 
 ---
 
